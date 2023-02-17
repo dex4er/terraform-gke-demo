@@ -29,7 +29,8 @@ resource "google_project_service" "compute" {
 }
 
 module "gcp-network" {
-  source = "terraform-google-modules/network/google"
+  source  = "terraform-google-modules/network/google"
+  version = "6.0.1"
 
   project_id   = local.project_id
   network_name = "demo-network"
