@@ -9,6 +9,14 @@ terraform {
       source  = "hashicorp/google-beta"
       version = "4.53.1"
     }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "2.18.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "3.4.3"
+    }
   }
 }
 
@@ -25,6 +33,11 @@ output "project_number" {
 
 resource "google_project_service" "compute" {
   service            = "compute.googleapis.com"
+  disable_on_destroy = false
+}
+
+resource "google_project_service" "container" {
+  service            = "container.googleapis.com"
   disable_on_destroy = false
 }
 
@@ -63,5 +76,25 @@ module "gcp-network" {
 
   depends_on = [
     google_project_service.compute,
+  ]
+}
+
+module "gke" {
+  source                          = "terraform-google-modules/kubernetes-engine/google"
+  version                         = "25.0.0"
+  project_id                      = local.project_id
+  name                            = "demo"
+  regional                        = true
+  region                          = local.region
+  network                         = module.gcp-network.network_name
+  subnetwork                      = "demo-subnet"
+  ip_range_pods                   = "demo-subnet-pods"
+  ip_range_services               = "demo-subnet-svc"
+  release_channel                 = "REGULAR"
+  enable_vertical_pod_autoscaling = false
+
+  depends_on = [
+    google_project_service.compute,
+    google_project_service.container,
   ]
 }
