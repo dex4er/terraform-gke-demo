@@ -1,4 +1,4 @@
-# terraform-gke-demo
+# terraform-gke-flux-demo
 
 Simple demo of the application deployed in GKE cluster using Flux with OCI
 repository instead of Git repository.
